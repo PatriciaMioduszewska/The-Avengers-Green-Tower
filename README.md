@@ -7,7 +7,7 @@
 
 ---
 
-## 📖 Over het Project
+##  Over het Project
 
 Traditionele landbouw verbruikt enorme hoeveelheden water en grondoppervlak. **The Avengers Green Tower** pakt dit aan met een schaalbare **vertical farming**-oplossing. 
 
@@ -15,12 +15,12 @@ Door sensoren (zoals pH, vocht, licht en temperatuur) te combineren met draadloz
 
 ---
 
-## ✨ Belangrijkste Features
+##  Belangrijkste Features
 
-- 📊 **Realtime Telemetrie:** Continue meting van pH-waarden, waterniveau, lichtwaarde en temperatuur.
-- 📡 **Draadloze IoT-Connectiviteit:** Energiezuinige en betrouwbare dataoverdracht vanaf de sensornodes naar de centrale hub.
-- 🖥️ **Centraal Dashboard:** Gebruiksvriendelijke interface met live grafieken, statusoverzichten en drempelwaarde-indicatoren.
-- ⚡ **Slimme Actuators:** Automatische of drempelgestuurde aansturing van irrigatie, dosering en verlichtingscyclus.
-- 🛡️ **Alerts & Logging:** Directe waarschuwingen wanneer kritieke waarden (zoals afwijkende pH) buiten de veilige groeimarges vallen.
+-  **Realtime Telemetrie:** Continue meting van pH-waarden, waterniveau, lichtwaarde en temperatuur.
+-  **Draadloze IoT-Connectiviteit:** Energiezuinige en betrouwbare dataoverdracht vanaf de sensornodes naar de centrale hub.
+-  **Centraal Dashboard:** Gebruiksvriendelijke interface met live grafieken, statusoverzichten en drempelwaarde-indicatoren.
+-  **Slimme Actuators:** Automatische of drempelgestuurde aansturing van irrigatie, dosering en verlichtingscyclus.
+-  **Alerts & Logging:** Directe waarschuwingen wanneer kritieke waarden (zoals afwijkende pH) buiten de veilige groeimarges vallen.
 
 ---
