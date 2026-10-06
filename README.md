@@ -17,10 +17,10 @@ Door sensoren (zoals pH, vocht, licht en temperatuur) te combineren met draadloz
 
 ## ✨ Belangrijkste Features
 
-- 📊 **Realtime Telemetrie:** Continue meting van pH-waarden, waterniveau, substraatvocht, temperatuur en luchtvochtigheid.
-- 📡 **Draadloze IoT-Connectiviteit:** Energiezuinige en betrouwbare dataoverdracht vanaf de sensornodes naar de centrale hub / cloud.
+- 📊 **Realtime Telemetrie:** Continue meting van pH-waarden, waterniveau, lichtwaarde en temperatuur.
+- 📡 **Draadloze IoT-Connectiviteit:** Energiezuinige en betrouwbare dataoverdracht vanaf de sensornodes naar de centrale hub.
 - 🖥️ **Centraal Dashboard:** Gebruiksvriendelijke interface met live grafieken, statusoverzichten en drempelwaarde-indicatoren.
-- ⚡ **Slimme Actuators:** Automatische of drempelgestuurde aansturing van irrigatie, dosering en verlichtingscycli.
+- ⚡ **Slimme Actuators:** Automatische of drempelgestuurde aansturing van irrigatie, dosering en verlichtingscyclus.
 - 🛡️ **Alerts & Logging:** Directe waarschuwingen wanneer kritieke waarden (zoals afwijkende pH) buiten de veilige groeimarges vallen.
 
 ---
