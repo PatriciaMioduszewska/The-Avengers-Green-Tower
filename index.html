@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Dashboard - The Avengers Green Tower</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://api.fontshare.com/v2/css?f[]=ranade@400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>The Avengers Green Tower</h1>
+        <p>Dit is een dashboard voor de sensoren van de Green Tower uitgevoerd als test voor connectie tussen TTS en Datacake.</p>
+    </header>
+
+    <div class="sensor-grid">
+
+        <div class="card">
+            <div class="card-header">
+                <span class="sensor-title">Waterniveau</span>
+                <span class="sensor-status" id="status-waterniveau">No data</span>
+            </div>
+            <div class="graph-placeholder" id="graph-waterniveau">
+                <p>Waterniveau</p>
+                <span>HIER KOMT NOG WATERNIVEAU GRAPH (trust)</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="sensor-title">pH waarde</span>
+                <span class="sensor-status" id="status-ph-waarde">No data</span>
+            </div>
+            <div class="graph-placeholder" id="graph-ph-waarde">
+                <p>pH waarde</p>
+                <span>HIER KOMT NOG PH WAARDE GRAPH</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="sensor-title">Buiten temperatuur</span>
+                <span class="sensor-status" id="status-buiten-temp">No data</span>
+            </div>
+            <div class="graph-placeholder" id="graph-buiten-temp">
+                <p>Buiten temperatuur</p>
+                <span>HIER KOMT NOG BUITEN TEMPERATUUR GRAPH</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="sensor-title">Binnen temperatuur</span>
+                <span class="sensor-status" id="status-binnen-temp">No datak</span>
+            </div>
+            <div class="graph-placeholder" id="graph-binnen-temp">
+                <p>Binnen temperatuur</p>
+                <span>HIER KOMT NOG BINNEN TEMPERATUUR GRAPH</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="sensor-title">Lichtniveau</span>
+                <span class="sensor-status" id="status-lichtniveau">No data</span>
+            </div>
+            <div class="graph-placeholder" id="graph-lichtniveau">
+                <p>Lichtniveau</p>
+                <span>HIER KOMT NOG LICHTNIVEAU GRAPH</span>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        The Avengers Green Tower &copy; MIT License 2026
+    </footer>
+</div>
+
+<script src="index.js"></script>
+</body>
+</html>
