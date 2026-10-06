@@ -1,5 +1,7 @@
+<img width="2048" height="334" alt="Untitled design" src="https://github.com/user-attachments/assets/c14b168c-84d3-4748-b13d-626e0072b363" />
 
-<img src="./The Avangers Green Tower(1).png" width=75%>
+
+
 
 # 🌿 The Avengers Green Tower | Vertical Farming System
 
