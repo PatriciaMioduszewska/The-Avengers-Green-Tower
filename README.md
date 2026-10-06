@@ -1,4 +1,7 @@
-# 🌿 The Avengers Green Tower | Smart Vertical Farming System
+
+<img src="./The Avangers Green Tower(1).png" width=75%>
+
+# 🌿 The Avengers Green Tower | Vertical Farming System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
