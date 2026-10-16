@@ -1,0 +1,186 @@
+#include <lmic.h>
+#include <hal/hal.h>
+#include <SPI.h>
+#include <EEPROM.h>
+#include "DFRobot_PH.h"
+
+// --- Hardware Pins ---
+#define PH_PIN A0  
+
+// --- Payload Formatting Options ---
+// Set to 1 to match the Combi application decoder (Channel 2, Type 0x9D, 1 byte: pH * 10)
+// Set to 0 to use standard Cayenne LPP Analog Input (Channel 2, Type 0x02, 2 bytes: pH * 100)
+#define USE_COMBI_PAYLOAD_FORMAT 1
+
+#define CHANNEL_PH 2
+#define LPP_PH 0x9D
+#define LPP_ANALOG_INPUT 0x02
+
+// Interval between transmissions in seconds
+const unsigned TX_INTERVAL = 30;
+
+DFRobot_PH ph;
+float voltage = 0.0;
+float phValue = 7.0;
+
+static osjob_t sendjob;
+
+// --- LoRaWAN Credentials (ABP - Patrycja) ---
+static const PROGMEM u1_t NWKSKEY[16] = { 0x57, 0x95, 0xC1, 0x94, 0xB4, 0xA9, 0x94, 0xEE, 0x99, 0x9D, 0xB1, 0xD3, 0x66, 0xD8, 0x0F, 0x49 };
+static const u1_t PROGMEM APPSKEY[16] = { 0x0B, 0xE3, 0xF7, 0x19, 0xC6, 0x4B, 0x33, 0x77, 0xB6, 0x87, 0xE7, 0xA0, 0xE0, 0x7E, 0xB0, 0x54 };
+static const u4_t DEVADDR = 0x260BDE78;
+
+void os_getArtEui(u1_t* buf) {}
+void os_getDevEui(u1_t* buf) {}
+void os_getDevKey(u1_t* buf) {}
+
+// Pin mapping matching the physical build
+const lmic_pinmap lmic_pins = {
+  .nss = 10,
+  .rxtx = LMIC_UNUSED_PIN,
+  .rst = 9,
+  .dio = { 2, 6, 7 },
+};
+
+void do_send(osjob_t* j);
+
+void onEvent(ev_t ev) {
+  switch (ev) {
+    case EV_TXCOMPLETE:
+      Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
+      if (LMIC.txrxFlags & TXRX_ACK) {
+        Serial.println(F("Received ACK"));
+      }
+      if (LMIC.dataLen) {
+        Serial.print(F("Received "));
+        Serial.print(LMIC.dataLen);
+        Serial.println(F(" bytes of payload"));
+      }
+      // Schedule the next transmission using LMIC's native OS timer
+      os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send);
+      break;
+
+    case EV_RESET:
+    case EV_LINK_DEAD:
+    case EV_LINK_ALIVE:
+      break;
+
+    default:
+      break;
+  }
+}
+
+void readPHSensor() {
+  // Flush ADC with a dummy read
+  analogRead(PH_PIN);
+  delay(10);
+
+  // Average 10 samples to smooth reading
+  long rawADC = 0;
+  for (int i = 0; i < 10; i++) {
+    rawADC += analogRead(PH_PIN);
+    delay(10);
+  }
+  rawADC /= 10;
+
+  // Calculate millivolts (assuming 5.0V VCC)
+  voltage = (rawADC / 1024.0) * 5000.0;
+
+  // Read pH calibrated at 25.0 C standard reference
+  phValue = ph.readPH(voltage, 25.0);
+
+  Serial.print(F("Analog Read: "));
+  Serial.print(rawADC);
+  Serial.print(F(" | Voltage: "));
+  Serial.print(voltage, 1);
+  Serial.print(F(" mV | pH: "));
+  Serial.println(phValue, 2);
+}
+
+void do_send(osjob_t* j) {
+  if (LMIC.opmode & OP_TXRXPEND) {
+    Serial.println(F("OP_TXRXPEND, not sending"));
+    return;
+  }
+
+  // Sample pH
+  readPHSensor();
+
+  byte payload[6];
+  uint8_t cursor = 0;
+
+#if USE_COMBI_PAYLOAD_FORMAT
+  // Matching shared team payload decoder (1 byte, 0.1 resolution)
+  uint8_t phEncoded = (uint8_t)(phValue * 10);
+  payload[cursor++] = CHANNEL_PH;
+  payload[cursor++] = LPP_PH;
+  payload[cursor++] = phEncoded;
+#else
+  // Standard Cayenne LPP Analog Input (2 bytes, 0.01 resolution)
+  int16_t phInt = (int16_t)(phValue * 100);
+  payload[cursor++] = CHANNEL_PH;
+  payload[cursor++] = LPP_ANALOG_INPUT;
+  payload[cursor++] = highByte(phInt);
+  payload[cursor++] = lowByte(phInt);
+#endif
+
+  // Debug payload bytes
+  Serial.print(F("Payload bytes: "));
+  for (int i = 0; i < cursor; i++) {
+    if (payload[i] < 0x10) Serial.print('0');
+    Serial.print(payload[i], HEX);
+    Serial.print(' ');
+  }
+  Serial.println();
+
+  // Queue packet to TTN
+  LMIC_setTxData2(1, payload, cursor, 0);
+  Serial.println(F("Packet queued"));
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println(F("Starting standalone pH node..."));
+
+  // Crucial: Load calibration points from EEPROM
+  ph.begin();
+
+  os_init();
+  LMIC_reset();
+  LMIC_setClockError(MAX_CLOCK_ERROR * 3 / 100);
+
+#ifdef PROGMEM
+  uint8_t appskey[sizeof(APPSKEY)];
+  uint8_t nwkskey[sizeof(NWKSKEY)];
+  memcpy_P(appskey, APPSKEY, sizeof(APPSKEY));
+  memcpy_P(nwkskey, NWKSKEY, sizeof(NWKSKEY));
+  LMIC_setSession(0x1, DEVADDR, nwkskey, appskey);
+#else
+  LMIC_setSession(0x1, DEVADDR, NWKSKEY, APPSKEY);
+#endif
+
+#if defined(CFG_eu868)
+  LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);
+  LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);
+  LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);
+  LMIC_setupChannel(3, 867100000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);
+  LMIC_setupChannel(4, 867300000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);
+  LMIC_setupChannel(5, 867500000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);
+  LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);
+  LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);
+  LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK, DR_FSK), BAND_MILLI);
+#elif defined(CFG_us915)
+  LMIC_selectSubBand(1);
+#endif
+
+  LMIC_setLinkCheckMode(0);
+  LMIC.dn2Dr = DR_SF9;
+  LMIC_setDrTxpow(DR_SF7, 14);
+
+  // Queue initial transmission
+  os_setCallback(&sendjob, do_send);
+}
+
+void loop() {
+  os_runloop_once();
+}
